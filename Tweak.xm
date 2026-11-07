@@ -3,7 +3,6 @@
 #import <Preferences/PSSpecifier.h>
 #import <Preferences/PSListController.h>
 
-// Khai báo mở rộng interface cho PSSpecifier để compiler nhận diện hàm
 @interface PSSpecifier (ScreenTimeUnlocker)
 - (void)setAction:(SEL)action;
 - (void)setTarget:(id)target;
@@ -23,7 +22,6 @@
 
     NSMutableArray *mutableSpecifiers = [origSpecifiers mutableCopy];
 
-    // Tạo PSSpecifier dạng nút bấm trong mục Trợ năng
     PSSpecifier *unlockSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Mở khóa Screen Time"
                                                                    target:self
                                                                       set:NULL
@@ -41,12 +39,16 @@
 }
 
 %new
-- (void)handleScreenTimeUnlockAction:(PSSpecifier * __unused)specifier {
+- (void)handleScreenTimeUnlockAction:(PSSpecifier *)specifier {
+    // Tránh cảnh báo unused variable một cách chuẩn cú pháp C/C++
+    (void)specifier;
+
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Screen Time Unlocker"
                                                                     message:@"Đã kích hoạt phím tắt quản lý Giờ sử dụng hệ thống!"
                                                                      preferredStyle:UIAlertControllerStyleAlert];
 
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Đồng ý" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Đồng ý" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        (void)action;
         NSLog(@"[ScreenTimeUnlocker] Nút mở khóa đã được kích hoạt thành công!");
     }];
 
