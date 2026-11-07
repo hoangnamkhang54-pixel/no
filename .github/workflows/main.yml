@@ -1,64 +1,37 @@
-#import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
-#import <Preferences/PSSpecifier.h>
-#import <Preferences/PSListController.h>
+name: Build Theos Tweak
 
-@interface PSSpecifier (ScreenTimeUnlocker)
-- (void)setAction:(SEL)action;
-- (void)setTarget:(id)target;
-@end
+on:
+  push:
+    branches: [ main, master ]
 
-@interface PSListController (ScreenTimeUnlocker)
-- (void)reloadSpecifiers;
-@end
+jobs:
+  build:
+    runs-on: macos-latest
 
-%hook AccessibilityController
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-- (NSArray *)specifiers {
-    NSArray *origSpecifiers = %orig;
-    if (!origSpecifiers) {
-        return nil;
-    }
+      - name: Setup Theos
+        run: |
+          if [ -d "$HOME/theos" ]; then
+            rm -rf $HOME/theos
+          fi
+          git clone --recursive https://github.com/theos/theos.git $HOME/theos
+          echo "THEOS=$HOME/theos" >> $GITHUB_ENV
+          echo "$HOME/theos/bin" >> $GITHUB_PATH
 
-    NSMutableArray *mutableSpecifiers = [origSpecifiers mutableCopy];
+      - name: Setup iOS SDK
+        run: |
+          rm -rf $HOME/theos/sdks
+          git clone --depth=1 https://github.com/theos/sdks.git $HOME/theos/sdks
 
-    PSSpecifier *unlockSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Mở khóa Screen Time"
-                                                                   target:self
-                                                                      set:NULL
-                                                                      get:NULL
-                                                                   detail:Nil
-                                                                     cell:PSButtonCell
-                                                                     edit:Nil];
+      - name: Build Package
+        run: |
+          make package FINALPACKAGE=1
 
-    [unlockSpecifier setTarget:self];
-    [unlockSpecifier setAction:@selector(handleScreenTimeUnlockAction:)];
-
-    [mutableSpecifiers insertObject:unlockSpecifier atIndex:0];
-
-    return mutableSpecifiers;
-}
-
-%new
-- (void)handleScreenTimeUnlockAction:(PSSpecifier *)specifier {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Screen Time Unlocker"
-                                                                    message:@"Đã kích hoạt phím tắt quản lý Giờ sử dụng hệ thống!"
-                                                                     preferredStyle:UIAlertControllerStyleAlert];
-
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Đồng ý" style:UIAlertActionStyleDefault handler:^(__unused UIAlertAction *action) {
-        NSLog(@"[ScreenTimeUnlocker] Nút mở khóa đã được kích hoạt thành công!");
-    }];
-
-    [alert addAction:okAction];
-
-    UIWindow *targetWindow = nil;
-    for (UIWindow *window in [UIApplication sharedApplication].windows) {
-        if (window.isKeyWindow) {
-            targetWindow = window;
-            break;
-        }
-    }
-
-    [targetWindow.rootViewController presentViewController:alert animated:YES completion:nil];
-}
-
-%end
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deb-package
+          path: packages/*.deb
