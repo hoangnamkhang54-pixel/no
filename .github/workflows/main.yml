@@ -14,12 +14,18 @@ jobs:
 
       - name: Setup Theos
         run: |
+          if [ -d "$HOME/theos" ]; then
+            echo "Theos đã tồn tại, tiến hành làm sạch..."
+            rm -rf $HOME/theos
+          fi
           git clone --recursive https://github.com/theos/theos.git $HOME/theos
           echo "THEOS=$HOME/theos" >> $GITHUB_ENV
           echo "$HOME/theos/bin" >> $GITHUB_PATH
 
       - name: Setup iOS SDK
         run: |
+          # Xóa thư mục sdks cũ nếu có để tránh xung đột
+          rm -rf $HOME/theos/sdks
           git clone --depth=1 https://github.com/theos/sdks.git $HOME/theos/sdks
 
       - name: Build Package
