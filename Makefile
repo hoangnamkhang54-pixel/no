@@ -8,7 +8,7 @@ TWEAK_NAME = ScreenTimeUnlocker
 ScreenTimeUnlocker_FILES = Tweak.xm
 ScreenTimeUnlocker_CFLAGS = -fobjc-arc
 
-# Chỉ định rõ đường dẫn PrivateFrameworks để linker nạp đúng PSSpecifier
-ScreenTimeUnlocker_LDFLAGS = -F$(THEOS_TARGET_SDK)/System/Library/PrivateFrameworks -framework Preferences
+# Ép linker tìm kiếm trực tiếp trong thư mục PrivateFrameworks của SDK hiện tại
+ScreenTimeUnlocker_LDFLAGS = -F$(THEOS_TARGET_SDK)/System/Library/PrivateFrameworks
 
 include $(THEOS_MAKE_PATH)/tweak.mk
