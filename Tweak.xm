@@ -12,16 +12,22 @@
 - (void)reloadSpecifiers;
 @end
 
-%hook AccessibilityController
+// Hook vào controller tổng của ứng dụng Cài đặt
+%hook PSListController
 
-- (NSArray *)specifiers {
-    NSArray *origSpecifiers = %orig;
-    if (!origSpecifiers) {
-        return nil;
+- (NSMutableArray *)specifiers {
+    NSMutableArray *specifiers = %orig;
+    if (!specifiers) return nil;
+
+    // Kiểm tra để tránh thêm trùng lặp nút bấm
+    static NSString *const kUnlockSpecifierID = @"ScreenTimeUnlockerButton";
+    for (PSSpecifier *spec in specifiers) {
+        if ([[spec identifier] isEqualToString:kUnlockSpecifierID]) {
+            return specifiers;
+        }
     }
 
-    NSMutableArray *mutableSpecifiers = [origSpecifiers mutableCopy];
-
+    // Tạo nút bấm ScreenTimeUnlocker
     PSSpecifier *unlockSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Mở khóa Screen Time"
                                                                    target:self
                                                                       set:NULL
@@ -29,40 +35,35 @@
                                                                    detail:Nil
                                                                      cell:PSButtonCell
                                                                      edit:Nil];
-
+    [unlockSpecifier setIdentifier:kUnlockSpecifierID];
     [unlockSpecifier setTarget:self];
     [unlockSpecifier setAction:@selector(handleScreenTimeUnlockAction:)];
 
-    [mutableSpecifiers insertObject:unlockSpecifier atIndex:0];
+    // Chèn nút lên ngay đầu danh sách
+    [specifiers insertObject:unlockSpecifier atIndex:0];
 
-    return mutableSpecifiers;
+    return specifiers;
 }
 
 %new
 - (void)handleScreenTimeUnlockAction:(PSSpecifier *)specifier {
-    // Tránh cảnh báo unused variable một cách chuẩn cú pháp C/C++
     (void)specifier;
 
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Screen Time Unlocker"
-                                                                    message:@"Đã kích hoạt phím tắt quản lý Giờ sử dụng hệ thống!"
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"ScreenTimeUnlocker"
+                                                                    message:@"Đã kích hoạt phím tắt mở khóa!"
                                                                      preferredStyle:UIAlertControllerStyleAlert];
 
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Đồng ý" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        (void)action;
-        NSLog(@"[ScreenTimeUnlocker] Nút mở khóa đã được kích hoạt thành công!");
-    }];
-
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Đồng ý" style:UIAlertActionStyleDefault handler:nil];
     [alert addAction:okAction];
 
-    UIWindow *targetWindow = nil;
+    UIWindow *keyWindow = nil;
     for (UIWindow *window in [UIApplication sharedApplication].windows) {
         if (window.isKeyWindow) {
-            targetWindow = window;
+            keyWindow = window;
             break;
         }
     }
-
-    [targetWindow.rootViewController presentViewController:alert animated:YES completion:nil];
+    [keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
 }
 
 %end
