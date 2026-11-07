@@ -1,0 +1,25 @@
+name: Build Theos Tweak
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: freemanrepo/theos:latest # Hoặc sử dụng Docker image chứa sẵn Theos & SDKs
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Package
+        run: |
+          make package FINALPACKAGE=1
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: deb-package
+          path: packages/*.deb
