@@ -7,5 +7,6 @@ TWEAK_NAME = ScreenTimeUnlocker
 
 ScreenTimeUnlocker_FILES = Tweak.xm
 ScreenTimeUnlocker_CFLAGS = -fobjc-arc
+ScreenTimeUnlocker_WEAK_FRAMEWORKS = Preferences
 
 include $(THEOS_MAKE_PATH)/tweak.mk
