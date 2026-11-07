@@ -23,16 +23,17 @@ jobs:
           echo "THEOS=$HOME/theos" >> $GITHUB_ENV
           echo "$HOME/theos/bin" >> $GITHUB_PATH
 
-      - name: Setup Toolchain & SDK
+      - name: Setup Theos Toolchain (Official Clone)
         run: |
-          # Tải Toolchain Linux-to-iOS chuẩn
-          mkdir -p $HOME/theos/toolchain/linux/iphone
-          curl -LO https://github.com/kabiroberai/theos-toolchain-linux/releases/download/v1.0.0/toolchain-linux-arm64.tar.gz
-          tar -xzf toolchain-linux-arm64.tar.gz -C $HOME/theos/toolchain/linux/iphone
-          rm toolchain-linux-arm64.tar.gz
+          mkdir -p $HOME/theos/toolchain
+          git clone --depth=1 https://github.com/theos/toolchain-linux.git $HOME/theos/toolchain/linux
 
-          # Tải iOS SDK
-          git clone --depth=1 https://github.com/theos/sdks.git $HOME/theos/sdks
+      - name: Setup iOS SDK
+        run: |
+          git clone --depth=1 https://github.com/theos/sdks.git /tmp/sdks
+          mkdir -p $HOME/theos/sdks
+          cp -r /tmp/sdks/*.sdk $HOME/theos/sdks/ || true
+          rm -rf /tmp/sdks
 
       - name: Build Package
         run: |
