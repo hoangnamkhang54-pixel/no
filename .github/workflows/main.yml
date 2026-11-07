@@ -3,7 +3,6 @@
 #import <Preferences/PSSpecifier.h>
 #import <Preferences/PSListController.h>
 
-// Khai báo mở rộng interface cho PSSpecifier để compiler nhận diện hàm
 @interface PSSpecifier (ScreenTimeUnlocker)
 - (void)setAction:(SEL)action;
 - (void)setTarget:(id)target;
@@ -23,7 +22,6 @@
 
     NSMutableArray *mutableSpecifiers = [origSpecifiers mutableCopy];
 
-    // Tạo PSSpecifier dạng nút bấm trong mục Trợ năng
     PSSpecifier *unlockSpecifier = [PSSpecifier preferenceSpecifierNamed:@"Mở khóa Screen Time"
                                                                    target:self
                                                                       set:NULL
