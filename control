@@ -1,0 +1,9 @@
+Package: com.yourname.screentimeunlocker
+Name: ScreenTimeUnlocker
+Depends: mobilesubstrate, firmware (>= 14.0)
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: Mở khóa Screen Time thông qua mục Trợ năng trong Cài đặt.
+Maintainer: YourName
+Author: YourName
+Section: Tweaks
