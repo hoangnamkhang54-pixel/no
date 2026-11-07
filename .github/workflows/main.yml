@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: freemanrepo/theos:latest # Hoặc sử dụng Docker image chứa sẵn Theos & SDKs
+      image: freemanrepo/theos:latest
 
     steps:
       - name: Checkout code
@@ -19,7 +19,7 @@ jobs:
           make package FINALPACKAGE=1
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: deb-package
           path: packages/*.deb
