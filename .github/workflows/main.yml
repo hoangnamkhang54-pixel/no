@@ -24,7 +24,10 @@ jobs:
 
       - name: Setup Theos Toolchain (Linux-to-iOS)
         run: |
-          git clone https://github.com/theos/toolchain-linux.git $HOME/theos/toolchain/linux
+          git clone --depth=1 https://github.com/theos/sdks.git /tmp/sdks || true
+          # Sử dụng mirror công khai của toolchain linux-to-ios
+          git clone --depth=1 https://github.com/FindTheLight1023/theos-toolchain-linux.git $HOME/theos/toolchain/linux || \
+          git clone --depth=1 https://github.com/theos/toolchain-linux.git $HOME/theos/toolchain/linux || true
 
       - name: Setup iOS SDK
         run: |
